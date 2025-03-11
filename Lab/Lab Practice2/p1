@@ -1,0 +1,114 @@
+package lab2;
+
+import java.util.*;
+
+public class StableMatching {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt(); // 读取人数
+
+        // 读取男生名字
+        String[] boys = new String[n];
+        for (int i = 0; i < n; i++) {
+            boys[i] = scanner.next();
+        }
+
+        // 读取女生名字
+        String[] girls = new String[n];
+        for (int i = 0; i < n; i++) {
+            girls[i] = scanner.next();
+        }
+
+        String[][] blike = new String[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                blike[i][j] = scanner.next();
+            }
+        }
+
+        String[][] glike = new String[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                glike[i][j] = scanner.next();
+            }
+        }
+
+        Map<String, Integer> boyIndexMap = new HashMap<>();
+        Map<String, Integer> girlIndexMap = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            boyIndexMap.put(boys[i], i);
+            girlIndexMap.put(girls[i], i);
+        }
+
+        // 2. 预处理女生的偏好：为每个女生创建男生名字到排名的映射（排名越小越喜欢）
+        List<Map<String, Integer>> girlPrefMaps = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            Map<String, Integer> prefMap = new HashMap<>();
+            for (int j = 0; j < n; j++) {
+                String boyName = glike[i][j];
+                prefMap.put(boyName, j); // j 越小表示排名越高
+            }
+            girlPrefMaps.add(prefMap);
+        }
+
+        // 3. 初始化数据结构
+        int[] nextProposalIndex = new int[n]; // 每个男生下一个要请求的女生索引
+        Arrays.fill(nextProposalIndex, 0);
+        String[] currentHusband = new String[n]; // 女生当前的未婚夫名字（初始为null）
+        Queue<Integer> freeBoys = new LinkedList<>(); // 自由男生的队列
+        for (int i = 0; i < n; i++) {
+            freeBoys.add(i); // 初始所有男生都是自由的
+        }
+
+        // 4. Gale-Shapley 主循环
+        while (!freeBoys.isEmpty()) {
+            int mIndex = freeBoys.poll(); // 取出一个自由男生
+            String mName = boys[mIndex]; // 男生的名字
+
+            // 如果男生已经向所有女生求过婚，理论上不会发生（因为算法保证解存在）
+            if (nextProposalIndex[mIndex] >= n) {
+                continue;
+            }
+
+            // 获取他下一个要求婚的女生名字
+            String wName = blike[mIndex][nextProposalIndex[mIndex]];
+            int wIndex = girlIndexMap.get(wName); // 女生的索引
+            nextProposalIndex[mIndex]++; // 无论成功与否，下次求婚下一个女生
+
+            // 情况1：女生当前没有未婚夫
+            if (currentHusband[wIndex] == null) {
+                currentHusband[wIndex] = mName; // 直接接受
+            } else {
+                // 情况2：女生已有未婚夫，比较两个男生的优先级
+                String currentMName = currentHusband[wIndex];
+                Map<String, Integer> wPrefMap = girlPrefMaps.get(wIndex);
+                int currentRank = wPrefMap.get(currentMName); // 当前未婚夫的排名
+                int newRank = wPrefMap.get(mName); // 新男生的排名
+
+                // 如果新男生的排名更高（数值更小），则替换未婚夫
+                if (newRank < currentRank) {
+                    currentHusband[wIndex] = mName; // 更新为新的未婚夫
+                    int oldMIndex = boyIndexMap.get(currentMName);
+                    freeBoys.add(oldMIndex); // 原未婚夫重新加入自由队列
+                } else {
+                    // 拒绝新男生，将当前男生重新加入队列，继续下次求婚
+                    freeBoys.add(mIndex);
+                }
+            }
+        }
+
+        // ------------------------- 输出结果 -------------------------
+        // 构建男生到女生的映射
+        Map<String, String> matches = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            String girl = girls[i];
+            String boy = currentHusband[i];
+            matches.put(boy, girl);
+        }
+
+        // 按男生输入顺序输出匹配结果
+        for (String boy : boys) {
+            System.out.println(boy + " " + matches.get(boy));
+        }
+    }
+}
