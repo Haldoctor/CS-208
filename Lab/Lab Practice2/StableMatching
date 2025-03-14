@@ -1,0 +1,71 @@
+package lab2;
+
+import java.util.*;
+
+public class StableMatching1 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        //Input the number of couples
+        int n = scanner.nextInt();
+        //Input the boys name
+        String[] boys = new String[n];
+        for (int i = 0 ; i < n ; i++){
+            boys[i] = scanner.next();
+        }
+        //Input the girls name
+        String[] girls = new String[n];
+        for (int i = 0 ; i < n ; i++){
+            girls[i] = scanner.next();
+        }
+        //Input the preference list of boys
+        String[][] blike = new String[n][n];
+        for (int i = 0 ; i < n ; i++){
+            for (int j = 0 ; j < n ; j++){
+                blike[i][j] = scanner.next();
+            }
+        }
+        //Input the preference list of girls
+        String[][] glike = new String[n][n];
+        for (int i = 0 ; i < n ; i++){
+            for (int j = 0 ; j < n ; j++){
+                glike[i][j] = scanner.next();
+            }
+        }
+        //Put the name list into the map
+        //Boys
+        Map<String, Integer> boy = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            boy.put(boys[i], i);
+        }
+        //Girls
+        Map<String, Integer> girl = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            girl.put(girls[i], i);
+        }
+        //Put the preference of girls into the map
+        List<Map<String, Integer>> girlpre = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            Map<String, Integer> preference = new HashMap<>();
+            for (int j = 0; j < n; j++) {
+                String boyName = glike[i][j];
+                preference.put(boyName, j);
+            }
+            girlpre.add(preference);
+        }
+        //Create a queue to store unpaired boys
+        Queue<Integer> single = new LinkedList<>();
+        int[] next = new int[n]; // 每个男生下一个要请求的女生索引
+        for (int i = 0 ; i < n ; i++){
+            next[i] = 0;
+        }
+        String[] husband = new String[n];
+        for (int i = 0 ; i < n ; i++){
+            single.add(i);
+        }
+        //Circulation of the matching procedure
+        while(!single.isEmpty()){
+            int man = single.poll();
+            String name = boys[man];
+        }
+    }
+}
