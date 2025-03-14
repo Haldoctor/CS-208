@@ -1,0 +1,80 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+public class TestCaseGenerator {
+
+    public static void main(String[] args) throws IOException {
+        int N = 5000; // 可修改为任意规模
+        boolean isExtremeCase = false; // true=极端场景 false=随机场景
+        generateInputFile(N, isExtremeCase);
+    }
+
+    private static void generateInputFile(int N, boolean isExtremeCase) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("testcase5000.txt"))) {
+            // 1. 写入N
+            writer.write(String.valueOf(N));
+            writer.newLine();
+
+            // 2. 生成男孩和女孩名字
+            List<String> boys = generateNames("b", N);
+            List<String> girls = generateNames("g", N);
+
+            // 3. 写入男孩列表
+            writer.write(String.join(" ", boys));
+            writer.newLine();
+
+            // 4. 写入女孩列表
+            writer.write(String.join(" ", girls));
+            writer.newLine();
+
+            // 5. 生成男孩偏好列表
+            for (String boy : boys) {
+                List<String> prefs;
+                if (isExtremeCase) {
+                    prefs = new ArrayList<>(girls); // 男孩按升序
+                } else {
+                    prefs = shuffledCopy(girls); // 随机偏好
+                }
+                writer.write(String.join(" ", prefs));
+                writer.newLine();
+            }
+
+            // 6. 生成女孩偏好列表
+            for (String girl : girls) {
+                List<String> prefs;
+                if (isExtremeCase) {
+                    prefs = reversedCopy(boys); // 女孩按降序
+                } else {
+                    prefs = shuffledCopy(boys); // 随机偏好
+                }
+                writer.write(String.join(" ", prefs));
+                writer.newLine();
+            }
+        }
+    }
+
+    private static List<String> generateNames(String prefix, int n) {
+        List<String> names = new ArrayList<>();
+        for (int i = 1; i <= n; i++) {
+            names.add(prefix + i);
+        }
+        return names;
+    }
+
+    private static List<String> reversedCopy(List<String> list) {
+        List<String> copy = new ArrayList<>(list);
+        Collections.reverse(copy);
+        return copy;
+    }
+
+    private static List<String> shuffledCopy(List<String> list) {
+        List<String> copy = new ArrayList<>(list);
+        Collections.shuffle(copy, new Random(System.currentTimeMillis()));
+        return copy;
+    }
+}
