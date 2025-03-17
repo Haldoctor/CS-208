@@ -1,0 +1,12 @@
+# Theory Assignment 2
+12312109 李泓霖
+## Exercise 1
+### a question
+#### (a)
+The time complexity is square of n, hypothesis the time consumption of current program is n<sup>2</sup>. After double the input, the input increase from n to 2n, so the time consumption will increase from n<sup>2</sup> to (2n)<sup>2</sup>, which is actually the 4n<sup>2</sup>. That means if we double the input, the algorithm will slower 4 times.
+#### (b)
+Similar to the (a) problem, the time consumption will increase from n<sup>2</sup> to (2n)<sup>2</sup> which is actually 8 times slower after double the input.
+#### (c)
+The constant in front of n<sup>2</sup> do not influence the relationship of size between two different input, so the algorithm still slower 4 times.
+#### (d)
+Hypothesis the initial time consumption is $nlogn$, after we doubled the input, the time consumption increase to $2nlog2n$ we can calculate <sup>$2nlog2n$</sup>/<sub>$nlogn$</sub> to solve out how much slower if the input is doubled. And the result of this expression is log(<sup>$40$</sup>/<sub>n<sup>2</sup></sub>). So the algorithm will go slower log(<sup>$40$</sup>/<sub>n<sup>2</sup></sub>) if input doubled.
