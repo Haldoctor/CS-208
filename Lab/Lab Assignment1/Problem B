@@ -1,0 +1,103 @@
+import java.util.*;
+
+public class GraphProblem {
+    static int n, m, a, b;
+    static Node[] nodes;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        n = scanner.nextInt();
+        m = scanner.nextInt();
+        a = scanner.nextInt();
+        b = scanner.nextInt();
+
+        nodes = new Node[n + 1];
+        for (int i = 1; i <= n; i++) {
+            nodes[i] = new Node();
+            nodes[i].value = i;
+        }
+
+        for (int i = 0; i < m; i++) {
+            int u = scanner.nextInt();
+            int v = scanner.nextInt();
+            nodes[u].connect.add(nodes[v]);
+            nodes[v].connect.add(nodes[u]);
+        }
+
+        Map<Integer, Integer> aComponents = getpart(a);
+        Map<Integer, Integer> bComponents = getpart(b);
+
+        List<Integer> valid = new ArrayList<>();
+        for (int i = 1 ; i <= n ; i++) {
+            if (i != a && i != b) {
+                valid.add(i);
+            }
+        }
+        int k = valid.size();
+
+        long asame = countsame(aComponents, valid);
+        long bsame = countsame(bComponents, valid);
+
+        Map<String, Integer> abMap = new HashMap<>();
+        for (int node : valid) {
+            String key = aComponents.get(node) + "_" + bComponents.get(node);
+            abMap.put(key, abMap.getOrDefault(key, 0) + 1);
+        }
+        long abSame = 0;
+        for (int cnt : abMap.values()) {
+            abSame += (long) cnt * (cnt - 1) / 2;
+        }
+
+        long total = (long) k * (k - 1) / 2;
+        long ans = total - asame - bsame + abSame;
+        System.out.println(ans);
+    }
+
+    private static Map<Integer, Integer> getpart(int excludeNode) {
+        Map<Integer, Integer> part = new HashMap<>();
+        boolean[] visited = new boolean[n + 1];
+        int id = 0;
+
+        for (int i = 1; i <= n; i++) {
+            if (i == excludeNode || visited[i]) continue;
+
+            Queue<Integer> queue = new LinkedList<>();
+            queue.add(i);
+            visited[i] = true;
+            part.put(i, id);
+            while (!queue.isEmpty()) {
+                int u = queue.poll();
+                for (Node neighbor : nodes[u].connect) {
+                    int v = neighbor.value;
+                    if (v != excludeNode && !visited[v]) {
+                        visited[v] = true;
+                        part.put(v, id);
+                        queue.add(v);
+                    }
+                }
+            }
+            id++;
+        }
+        return part;
+    }
+
+    private static long countsame(Map<Integer, Integer> part, List<Integer> valids) {
+        Map<Integer, Integer> count = new HashMap<>();
+        for (int node : valids) {
+            int comp = part.get(node);
+            count.put(comp, count.getOrDefault(comp, 0) + 1);
+        }
+        long pairs = 0;
+        Iterator<Integer> iterator = count.values().iterator();
+        while (iterator.hasNext()) {
+            int cnt = iterator.next();
+            pairs += (long) cnt * (cnt - 1) / 2;
+        }
+        return pairs;
+    }
+}
+
+class Node {
+    int value;
+    ArrayList<Node> connect = new ArrayList<>();
+}
